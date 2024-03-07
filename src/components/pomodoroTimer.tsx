@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useInterval } from '../hooks/useInterval';
 import { Button } from './button';
 import { Timer } from './timer';
@@ -12,10 +12,40 @@ interface Props {
 
 export function PomodoroTimer(props: Props): JSX.Element {
   const [mainTime, setMainTime] = useState(props.pomodoroTime);
+  const [timeCounting, setTimeCounting] = useState(false);
+  const [working, setWorking] = useState(false);
+  const [resting, setResting] = useState(false);
 
-  useInterval(() => {
-    setMainTime((prev) => prev - 1);
-  }, 1000);
+  useEffect(() => {
+    if (working) document.body.classList.add('working');
+    if (resting) document.body.classList.remove('working');
+  }, [working]);
+
+  useInterval(
+    () => {
+      setMainTime((prev) => prev - 1);
+    },
+    timeCounting ? 1000 : null,
+  );
+
+  const configureWork = () => {
+    setTimeCounting(true);
+    setWorking(true);
+    setResting(false);
+    setMainTime(props.pomodoroTime);
+  };
+
+  const configureRest = (long: boolean) => {
+    setTimeCounting(true);
+    setWorking(false);
+    setResting(true);
+
+    if (long) {
+      setMainTime(props.longRestTime);
+    } else {
+      setMainTime(props.shortRestTime);
+    }
+  };
 
   return (
     <div className="pomodoro">
@@ -24,21 +54,22 @@ export function PomodoroTimer(props: Props): JSX.Element {
 
       <div className="controls">
         <Button
-          text="teste"
+          text="Work"
           onClick={() => {
-            console.log(1);
+            configureWork();
           }}
         ></Button>
         <Button
-          text="teste"
+          text="Rest"
           onClick={() => {
-            console.log(2);
+            configureRest(false);
           }}
         ></Button>
         <Button
-          text="teste"
+          className={!working && !resting ? 'hidden' : ''}
+          text={timeCounting ? 'Pause' : 'Play'}
           onClick={() => {
-            console.log(3);
+            setTimeCounting(!timeCounting);
           }}
         ></Button>
       </div>
