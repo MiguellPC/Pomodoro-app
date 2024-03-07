@@ -1,0 +1,7 @@
+{
+  "code-runner.executorMap": {
+    "typescript": "npx ts-node --transpile-only --files"
+  },
+  "CodeGPT.apiKey": "CodeGPT Plus Beta",
+  "cSpell.words": ["Pomodoro"]
+}
