@@ -57,6 +57,8 @@ export function PomodoroTimer(props: Props): JSX.Element {
 
     audioFinishWorking.play();
   };
+  // como voltar atrás no git e fazer um commit novo
+  // git reset --soft HEAD~1
 
   return (
     <div className="pomodoro">
