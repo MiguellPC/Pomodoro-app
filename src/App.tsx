@@ -3,8 +3,13 @@ import { PomodoroTimer } from './components/pomodoroTimer';
 
 function App() {
   return (
-    <div className="App">
-      <PomodoroTimer defaultPomodoroTime={1500} />
+    <div className="container">
+      <PomodoroTimer
+        pomodoroTime={1500}
+        shortRestTime={300}
+        longRestTime={900}
+        cycles={4}
+      />
     </div>
   );
 }
