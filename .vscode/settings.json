@@ -3,5 +3,5 @@
     "typescript": "npx ts-node --transpile-only --files"
   },
   "CodeGPT.apiKey": "CodeGPT Plus Beta",
-  "cSpell.words": ["pomodoro", "Pomodoro"]
+  "cSpell.words": ["pomodoro", "Pomodoro", "Pomodoros"]
 }
