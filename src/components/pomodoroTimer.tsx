@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useInterval } from '../hooks/useInterval';
 import { Button } from './button';
 import { Timer } from './timer';
+import { Options } from './options';
 import { secondsToTime } from '../utils/secondsToTime';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -24,12 +25,17 @@ export function PomodoroTimer(props: Props): JSX.Element {
   const [timeCounting, setTimeCounting] = useState(false);
   const [working, setWorking] = useState(false);
   const [resting, setResting] = useState(false);
+  const [shortRest, setShortRest] = useState(props.shortRestTime);
+  const [longRest, setLongRest] = useState(props.longRestTime);
+  const [userCycles, setUserCycles] = useState(props.cycles);
   const [cyclesQtdManager, setCyclesQtdManager] = useState(
-    new Array(props.cycles - 1).fill(true),
+    new Array(userCycles - 1).fill(true),
   );
   const [completedCycles, setCompletedCycles] = useState(0);
   const [fullWorkingTime, setFullWorkingTime] = useState(0);
   const [numberOfPomodoros, setNumberOfPomodoros] = useState(0);
+
+  const [userTime, setUserTime] = useState(props.pomodoroTime);
 
   useInterval(
     () => {
@@ -43,14 +49,15 @@ export function PomodoroTimer(props: Props): JSX.Element {
     setTimeCounting(true);
     setWorking(true);
     setResting(false);
-    setMainTime(props.pomodoroTime);
+    setMainTime(userTime !== mainTime ? userTime : mainTime);
     audioStartWorking.play();
   }, [
     setTimeCounting,
     setWorking,
     setResting,
     setMainTime,
-    props.pomodoroTime,
+    mainTime,
+    userTime,
   ]);
 
   const configureRest = useCallback(
@@ -60,26 +67,25 @@ export function PomodoroTimer(props: Props): JSX.Element {
       setResting(true);
 
       if (long) {
-        setMainTime(props.longRestTime);
+        setMainTime(longRest);
       } else {
-        setMainTime(props.shortRestTime);
+        setMainTime(shortRest);
       }
 
       audioFinishWorking.play();
     },
-    [
-      setTimeCounting,
-      setWorking,
-      setResting,
-      setMainTime,
-      props.longRestTime,
-      props.shortRestTime,
-    ],
+    [setTimeCounting, setWorking, setResting, setMainTime, longRest, shortRest],
   );
 
   useEffect(() => {
-    if (working) document.body.classList.add('working');
-    if (resting) document.body.classList.remove('working');
+    if (working) {
+      document.body.classList.remove('bg-resting', 'bg-initial');
+      document.body.classList.add('working', 'bg-working');
+    }
+    if (resting) {
+      document.body.classList.remove('working', 'bg-working', 'bg-initial');
+      document.body.classList.add('bg-resting');
+    }
 
     if (mainTime > 0) return;
 
@@ -88,7 +94,7 @@ export function PomodoroTimer(props: Props): JSX.Element {
       cyclesQtdManager.pop();
     } else if (working && cyclesQtdManager.length <= 0) {
       configureRest(true);
-      setCyclesQtdManager(new Array(props.cycles - 1).fill(true));
+      setCyclesQtdManager(new Array(userCycles - 1).fill(true));
       setCompletedCycles((prev) => prev + 1);
     }
 
@@ -105,10 +111,25 @@ export function PomodoroTimer(props: Props): JSX.Element {
     numberOfPomodoros,
     completedCycles,
     props.cycles,
+    userCycles,
+    userTime,
   ]);
 
   return (
     <div className="pomodoro">
+      <Options
+        mainTime={mainTime}
+        shortRestTime={shortRest}
+        longRestTime={longRest}
+        cycles={userCycles}
+        setMainTime={setMainTime}
+        setUserTime={setUserTime}
+        setCycles={setCyclesQtdManager}
+        setUserCycles={setUserCycles}
+        setShortRestTime={setShortRest}
+        setLongRestTime={setLongRest}
+      />
+
       <h2>Você está: {working ? 'Trabalhando' : 'Descansando'}</h2>
       <Timer mainTime={mainTime} />
 
@@ -135,9 +156,15 @@ export function PomodoroTimer(props: Props): JSX.Element {
       </div>
 
       <div className="details">
-        <p>Ciclos concluídos: {completedCycles}</p>
-        <p>Horas trabalhadas: {secondsToTime(fullWorkingTime)}</p>
-        <p>Pomodoros concluídos: {numberOfPomodoros}</p>
+        <p>
+          Ciclos concluídos: <span>{completedCycles}</span>
+        </p>
+        <p>
+          Horas trabalhadas: <span>{secondsToTime(fullWorkingTime)}</span>
+        </p>
+        <p>
+          Pomodoros concluídos: <span>{numberOfPomodoros}</span>
+        </p>
       </div>
     </div>
   );
