@@ -104,7 +104,7 @@ export function Options(props: Props): JSX.Element {
             ?.classList.toggle('active');
         }}
       >
-        <img src="/cog.svg"></img>
+        <img src="./cog.svg"></img>
       </div>
       <form className="options-container">
         <h2>Configurações</h2>
