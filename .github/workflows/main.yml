@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: './dist'
+          path: './build'
 
       # deploy the react app to github pages
       - name: Deploy to GitHub Pages
